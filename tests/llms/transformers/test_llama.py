@@ -12,7 +12,7 @@ def test_basic():
     if torch.cuda.device_count() == 0:
         pytest.skip("No GPU, so skipping large model test.")
 
-    model_path = "elinas/llama-13b-hf-transformers-4.29"
+    model_path = "/root/.cache/huggingface/hub/models--elinas--llama-7b-hf-transformers-4.29/snapshots/d33594ee64ef1b6264543b6a88f60982a55fdb7a/"
     config = AutoConfig.from_pretrained(model_path)
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     with init_empty_weights():
