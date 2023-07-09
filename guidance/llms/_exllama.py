@@ -342,7 +342,7 @@ class ExLLaMASession(LLMSession):
                 _input_ids = input_ids
                 for token in self.llm.model_obj.generate_raw_stream_with_bias(**generate_args):
                     scores = (self.llm.model_obj.logits[0],)
-                    next_tokens_scores = logits_processor(input_ids, scores)
+                    next_tokens_scores = logits_processor(input_ids, scores[0])
                     next_tokens = torch.argmax(next_tokens_scores, dim=-1)
                     print(input_ids)
                     print(token)
