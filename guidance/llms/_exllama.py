@@ -212,6 +212,10 @@ class ExLLaMASession(LLMSession):
 
             assert prompt != "", "You must provide a non-zero length prompt to the Transformers language model!"
 
+            print(self.llm.encode(prompt))
+            print(self.llm.encode_ex(prompt))
+            raise Exception('stop')
+
             # encode the prompt
             import torch
             # encoded2 = self.llm.encode([prompt for _ in range(n)], return_tensors="pt")
@@ -222,10 +226,6 @@ class ExLLaMASession(LLMSession):
             input_ids = encoded#["input_ids"]
             # attention_mask = encoded["attention_mask"]
             model_config = self.llm.model_obj.config
-
-            print(input_ids)
-            print(self.llm.encode_ex(prompt))
-            raise Exception('stop')
 
             # ensure that we are extending a common sequence batch (our token healing assumes this right now)
             assert (input_ids[0,-1] == input_ids[:,-1]).all(), "The current token healing implementation assumes that batches are reps of the same sequence!"
