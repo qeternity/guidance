@@ -62,7 +62,6 @@ async def select(variable_name="selected", options=None, logprobs=None, list_app
     # build a trie of the options
     token_map = pygtrie.Trie()
     for i,option in enumerate(options_tokens):
-        print(i, option)
         token_map[option] = i
     
     async def recursive_select(current_prefix, allow_token_extension=True):

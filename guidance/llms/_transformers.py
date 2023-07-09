@@ -333,7 +333,6 @@ class TransformersSession(LLMSession):
             # if we are not streaming we still manually use the streamer for consistency
             else:
                 generated_sequence = self.llm.model_obj.generate(**generate_args)
-                print(generated_sequence)
                 streamer.put(generated_sequence)
                 self.llm.cache[key] = streamer.__next__()
                 self._update_prefix_cache(streamer)
@@ -348,6 +347,7 @@ class TransformersSession(LLMSession):
         list_out = []
         for out in streamer:
             list_out.append(out)
+            print(out)
             yield out
         thread.join() # clean up the thread
         self.llm.cache[key] = list_out
