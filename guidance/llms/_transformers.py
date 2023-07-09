@@ -210,6 +210,7 @@ class TransformersSession(LLMSession):
         in_cache = key in llm_cache
         not_caching = (caching is not True and not self.llm.caching) or caching is False
         if not in_cache or not_caching:
+            raise Exception('stop')
             import transformers
 
             assert prompt != "", "You must provide a non-zero length prompt to the Transformers language model!"
