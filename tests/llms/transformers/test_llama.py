@@ -19,8 +19,8 @@ def test_basic():
         model = AutoModelForCausalLM.from_config(config)
     model.tie_weights()
     model = load_checkpoint_and_dispatch(
-    model, model_path, device_map="auto", dtype=torch.float16
-)
+        model, model_path, device_map="auto", dtype=torch.float16
+    )
 
     # just make sure it runs
     llm = guidance.llms.transformers.LLaMA(model, tokenizer, device=1, torch_dtype=torch.float16)
