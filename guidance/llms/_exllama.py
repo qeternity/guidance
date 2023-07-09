@@ -10,7 +10,7 @@ import collections.abc
 from exllama_lib.model import ExLlama as ExLlamaModel
 from exllama_lib.tokenizer import ExLlamaTokenizer
 from exllama_lib.generator import ExLlamaGenerator
-from transformers.models.llama.tokenization_llama_fast import LlamaTokenizerFast
+from transformers.models.llama.tokenization_llama_fast import LlamaTokenizer as LlamaTokenizerFast
 
 from ._llm import LLM, LLMSession, SyncSession
 
