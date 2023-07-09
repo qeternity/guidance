@@ -679,7 +679,7 @@ class ExLLaMAStreamer():
         # extract the scores if we are given them (and format them to be the same shape as the tokens)
         if self.logprobs:
             assert len(new_tokens) == 1, "logprobs are not supported for batched generation right now in guidance.llms.Transformers"
-            print(token_obj['scores'])
+            print(token_obj)
             raise Exception('stop')
             new_scores = [torch.nn.functional.log_softmax(x, dim=-1).cpu() for x in token_obj['scores']]
             len_diff = len(new_tokens[0]) - len(new_scores)
