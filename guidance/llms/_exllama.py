@@ -343,7 +343,7 @@ class ExLLaMASession(LLMSession):
                     stop = False
                     if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
-                scores = self.llm.model_obj.logits.squeeze()
+                scores = (self.llm.model_obj.logits,)
                 print(scores)
                 raise Exception('stop')
                 token_obj = GreedySearchDecoderOnlyOutput(sequences=self.llm.model_obj.sequence, scores=scores)
