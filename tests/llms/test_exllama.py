@@ -24,10 +24,14 @@ def test_basic():
     cache = ExLlamaCache(model)                             # create cache for inference
     generator = ExLlamaGenerator(model, tokenizer, cache)   # create generator
 
-    llm = guidance.llms.ExLLaMA(model=model, generator=generator, tokenizer=tokenizer, caching=False)
+    guidance.llm = guidance.llms.ExLLaMA(model=model, generator=generator, tokenizer=tokenizer, caching=False)
 
     # just make sure it runs
-    out = guidance(
-        """The height of the Sears tower is {{gen 'answer' }}""", llm=llm
-    )()
-    assert len(out["answer"]) > 0
+    out = guidance("""The height of the Sears tower is {{gen 'answer' pattern='[0-9]+'}}""")()
+    assert int(out['answer']) > 1000
+
+    out = guidance("""The Sun is very {{#select 'answer'}}hot{{or}}cold{{/select}}.""")()
+    assert out["answer"] == 'hot'
+
+    out = guidance("""The North Pole is {{#select 'answer'}}scorching{{or}}freezing{{/select}}.""")()
+    assert out["answer"] == 'freezing'
