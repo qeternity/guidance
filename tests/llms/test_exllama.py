@@ -30,5 +30,9 @@ def test_basic():
     out = guidance(
         """The height of the Sears tower is {{gen 'answer' }}""", llm=llm
     )()
+
+    out = guidance(
+        """The Sun is very {{#select 'answer'}}hot{{or}}cold{{/select}}.""", llm=llm
+    )()
     raise Exception(out)
     assert len(out["answer"]) > 0
