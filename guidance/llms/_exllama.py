@@ -339,8 +339,8 @@ class ExLLaMASession(LLMSession):
             # if we are not streaming we still manually use the streamer for consistency
             else:
                 for token in self.llm.model_obj.generate_raw_stream_with_bias(**generate_args):
-                    # stop = stopping_criteria(self.llm.model_obj.sequence, self.llm.model_obj.sequence)
-                    stop = False
+                    scores = (self.llm.model_obj.logits[0],)
+                    stop = stopping_criteria(self.llm.model_obj.sequence, scores)
                     if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
                 scores = (self.llm.model_obj.logits[0],)
