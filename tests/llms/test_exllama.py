@@ -26,15 +26,12 @@ def test_basic():
 
     llm = guidance.llms.ExLLaMA(model=model, generator=generator, tokenizer=tokenizer, caching=False)
 
-    # just make sure it runs
-    out = guidance("""The height of the Sears tower is {{gen 'answer' max_tokens=10}}""", llm=llm)()
+    with llm.session() as s:
+        # just make sure it runs
+        out = s("""The height of the Sears tower is {{gen 'answer' max_tokens=10}}""")
 
-    out = guidance(
-        """The Sun is very {{#select 'answer'}}hot{{or}}cold{{/select}}.""", llm=llm
-    )()
-    assert out["answer"] == 'hot'
+        out = guidance("""The Sun is very {{#select 'answer'}}hot{{or}}cold{{/select}}.""")
+        assert out["answer"] == 'hot'
 
-    out = guidance(
-        """The North Pole is {{#select 'answer'}}scorching{{or}}freezing{{/select}}.""", llm=llm
-    )()
-    assert out["answer"] == 'freezing'
+        out = guidance("""The North Pole is {{#select 'answer'}}scorching{{or}}freezing{{/select}}.""")
+        assert out["answer"] == 'freezing'
