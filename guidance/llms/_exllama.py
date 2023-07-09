@@ -338,6 +338,7 @@ class ExLLaMASession(LLMSession):
             # if we are not streaming we still manually use the streamer for consistency
             else:
                 self.llm.model_obj.gen_begin(input_ids)
+                raise Exception(generate_args)
                 for token in self.llm.model_obj.generate_raw_stream_with_bias(**generate_args):
                     # stop = stopping_criteria(self.llm.model_obj.sequence, self.llm.model_obj.sequence)
                     stop = False
