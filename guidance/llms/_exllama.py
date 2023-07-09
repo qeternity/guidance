@@ -218,6 +218,8 @@ class ExLLaMASession(LLMSession):
             # attention_mask = encoded["attention_mask"]
             model_config = self.llm.model.config
 
+            print(input_ids)
+
             # ensure that we are extending a common sequence batch (our token healing assumes this right now)
             assert (input_ids[0,-1] == input_ids[:,-1]).all(), "The current token healing implementation assumes that batches are reps of the same sequence!"
 
