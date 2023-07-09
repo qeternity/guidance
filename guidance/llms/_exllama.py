@@ -330,6 +330,7 @@ class ExLLaMASession(LLMSession):
 
             # if we are streaming then we need to run the inference process in a separate thread
             stopping_criteria = transformers.StoppingCriteriaList(stoppers)
+            logits_processor = transformers.LogitsProcessorList(processors)
             if stream:
                 generate_args["streamer"] = streamer
                 thread = threading.Thread(target=self.llm.model_obj.generate, kwargs=generate_args)
@@ -338,9 +339,18 @@ class ExLLaMASession(LLMSession):
 
             # if we are not streaming we still manually use the streamer for consistency
             else:
+                _input_ids = input_ids
                 for token in self.llm.model_obj.generate_raw_stream_with_bias(**generate_args):
                     scores = (self.llm.model_obj.logits[0],)
-                    stop = stopping_criteria(self.llm.model_obj.sequence, self.llm.model_obj.sequence)
+                    next_tokens_scores = logits_processor(input_ids, scores)
+                    next_tokens = torch.argmax(next_tokens_scores, dim=-1)
+                    print(input_ids)
+                    print(token)
+                    print(scores)
+                    print(next_tokens_scores)
+                    print(next_tokens)
+                    raise Exception('stop')
+                    stop = stopping_criteria(self.llm.model_obj.sequence, scores)
                     if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
                 scores = (self.llm.model_obj.logits[0],)
