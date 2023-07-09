@@ -19,7 +19,7 @@ def test_basic():
         model = AutoModelForCausalLM.from_config(config)
     model.tie_weights()
     model = load_checkpoint_and_dispatch(
-        model, model_path, device_map="cuda:0", dtype=torch.float16
+        model, model_path, device_map="sequential", dtype=torch.float16
     )
 
     # just make sure it runs
