@@ -56,6 +56,11 @@ async def select(variable_name="selected", options=None, logprobs=None, list_app
     # TODO: this retokenizes the whole prefix many times, perhaps this could become a bottleneck?
     options_tokens = [parser.program.llm.encode(variable_stack["@prefix"] + option) for option in options]
 
+    print(options)
+    print(logprobs)
+    print(options_tokens)
+    raise Exception('stop')
+
     # encoding the prefix and then decoding it might change the length, so we need to account for that
     recoded_parser_prefix_length = len(parser.program.llm.decode(parser.program.llm.encode(variable_stack["@prefix"])))
 
