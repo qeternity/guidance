@@ -652,8 +652,6 @@ class TransformersStreamer():
         self.prefix_cache = []
 
     def put(self, token_obj):
-        print(token_obj)
-        raise Exception('stop')
 
         import torch
         if isinstance(token_obj, torch.Tensor):

@@ -11,6 +11,7 @@ from exllama_lib.model import ExLlama as ExLlamaModel
 from exllama_lib.tokenizer import ExLlamaTokenizer
 from exllama_lib.generator import ExLlamaGenerator
 from transformers.models.llama.tokenization_llama_fast import LlamaTokenizer as LlamaTokenizerFast
+from transformers.generation.utils import GreedySearchDecoderOnlyOutput
 
 from ._llm import LLM, LLMSession, SyncSession
 
@@ -342,8 +343,8 @@ class ExLLaMASession(LLMSession):
                     stop = False
                     if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
-
-                streamer.put(self.llm.model_obj.sequence)
+                token_obj = GreedySearchDecoderOnlyOutput(sequence=self.llm.model_obj.sequence)
+                streamer.put(token_obj)
                 self.llm.cache[key] = streamer.__next__()
                 self._update_prefix_cache(streamer)
         return llm_cache[key]
