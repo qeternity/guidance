@@ -344,12 +344,12 @@ class ExLLaMASession(LLMSession):
                     scores = (self.llm.model_obj.logits[0],)
                     next_tokens_scores = logits_processor(input_ids, scores[0])
                     next_tokens = torch.argmax(next_tokens_scores, dim=-1)
-                    print(input_ids)
-                    print(token)
-                    print(scores)
-                    print(next_tokens_scores)
-                    print(next_tokens)
-                    raise Exception('stop')
+                    # print(input_ids)
+                    # print(token)
+                    # print(scores)
+                    # print(next_tokens_scores)
+                    # print(next_tokens)
+                    # raise Exception('stop')
                     stop = stopping_criteria(self.llm.model_obj.sequence, scores)
                     if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
