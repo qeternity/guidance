@@ -212,13 +212,14 @@ class ExLLaMASession(LLMSession):
 
             # encode the prompt
             import torch
+            # encoded2 = self.llm.encode([prompt for _ in range(n)], return_tensors="pt")
             encoded = self.llm.encode(prompt)
-            encoded = torch.tensor(encoded)
+            encoded = torch.tensor([encoded for _ in range(n)])
+            if self.llm.device is not None:
+                encoded = encoded.to(self.llm.device)
             input_ids = encoded#["input_ids"]
             # attention_mask = encoded["attention_mask"]
-            model_config = self.llm.model.config
-
-            print(input_ids)
+            model_config = self.llm.model_obj.config
 
             # ensure that we are extending a common sequence batch (our token healing assumes this right now)
             assert (input_ids[0,-1] == input_ids[:,-1]).all(), "The current token healing implementation assumes that batches are reps of the same sequence!"
