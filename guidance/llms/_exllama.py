@@ -10,7 +10,8 @@ import collections.abc
 from exllama_lib.model import ExLlama as ExLlamaModel
 from exllama_lib.tokenizer import ExLlamaTokenizer
 from exllama_lib.generator import ExLlamaGenerator
-from transformers.models.llama.tokenization_llama_fast import LlamaTokenizerFast
+from transformers.models.llama.tokenization_llama_fast import LlamaTokenizer as LlamaTokenizerFast
+from transformers.generation.utils import GreedySearchDecoderOnlyOutput
 
 from ._llm import LLM, LLMSession, SyncSession
 
@@ -20,6 +21,7 @@ class ExLLaMA(LLM):
     """
 
     llm_name: str = "transformers"
+    device: str = None
 
     def __init__(self, model: ExLlamaModel, generator: ExLlamaGenerator, tokenizer: ExLlamaTokenizer, caching=True, token_healing=False, acceleration=False, \
                  temperature=0.0, device=None, **kwargs):
@@ -43,6 +45,7 @@ class ExLLaMA(LLM):
         self._token_prefix_map = self._build_token_prefix_map(model)
 
         self.tokenizer.eos_token = self.id_to_token(self.model.config.eos_token_id)
+        self.model_obj.config = self.model.config
 
     def new_string_builder(self, starting_ids=None):
         return ExLLaMAStringBuilder(self, starting_ids)
@@ -52,18 +55,30 @@ class ExLLaMA(LLM):
         """
         return [v for arr in self._token_prefix_map.values(prefix=prefix) for v in arr]
 
+    # def encode(self, string, **kwargs):
+    #     return self.tokenizer_hf.encode(string, **kwargs)
+        
+    # def decode(self, tokens, **kwargs):
+    #     return self.tokenizer_hf.decode(tokens, **kwargs)
+    
     def encode(self, string, **kwargs):
-        return self.tokenizer.encode(string, **kwargs)
+        return self.tokenizer.encode(string, **kwargs).squeeze().tolist()
         
     def decode(self, tokens, **kwargs):
         return self.tokenizer.decode(tokens, **kwargs)
     
     def id_to_token(self, id):
-        token = self.tokenizer.tokenizer.Decode(id)
-        return token
+        return self.tokenizer_hf.convert_ids_to_tokens([id])[0]
     
     def token_to_id(self, token):
-        return self.tokenizer.tokenizer.Encode(token)[-1]
+        return self.tokenizer_hf.convert_tokens_to_ids([token])[0]
+    
+    # def id_to_token(self, id):
+    #     token = self.tokenizer.tokenizer.Decode(id)
+    #     return token
+    
+    # def token_to_id(self, token):
+    #     return self.tokenizer.tokenizer.Encode(token)[-1]
 
     def end_of_text(self):
         return self.tokenizer.eos_token
@@ -200,11 +215,14 @@ class ExLLaMASession(LLMSession):
 
             # encode the prompt
             import torch
+            # encoded2 = self.llm.encode([prompt for _ in range(n)], return_tensors="pt")
             encoded = self.llm.encode(prompt)
-            encoded = torch.tensor(encoded)
+            encoded = torch.tensor([encoded for _ in range(n)])
+            if self.llm.device is not None:
+                encoded = encoded.to(self.llm.device)
             input_ids = encoded#["input_ids"]
             # attention_mask = encoded["attention_mask"]
-            model_config = self.llm.model.config
+            model_config = self.llm.model_obj.config
 
             # ensure that we are extending a common sequence batch (our token healing assumes this right now)
             assert (input_ids[0,-1] == input_ids[:,-1]).all(), "The current token healing implementation assumes that batches are reps of the same sequence!"
@@ -280,21 +298,27 @@ class ExLLaMASession(LLMSession):
                 logprobs=logprobs
             )
 
-            # the args for the transformers generate call
+            # # the args for the transformers generate call
+            # generate_args = dict(
+            #     inputs=input_ids,
+            #     # attention_mask=attention_mask,
+            #     # position_ids=position_ids,
+            #     temperature=temperature,
+            #     max_new_tokens=max_tokens,
+            #     top_p=top_p,
+            #     pad_token_id=model_config.pad_token_id if model_config.pad_token_id is not None else self.llm.tokenizer.eos_token_id,
+            #     logits_processor=transformers.LogitsProcessorList(processors),
+            #     stopping_criteria=transformers.StoppingCriteriaList(stoppers),
+            #     # past_key_values=self._past_key_values,
+            #     output_scores=logprobs is not None and logprobs > 0,
+            #     return_dict_in_generate=True,
+            #     **generate_kwargs
+            # )
+
             generate_args = dict(
-                inputs=input_ids,
-                # attention_mask=attention_mask,
-                # position_ids=position_ids,
-                temperature=temperature,
+                prefix=input_ids,
+                logit_bias=logit_bias,
                 max_new_tokens=max_tokens,
-                top_p=top_p,
-                pad_token_id=model_config.pad_token_id if model_config.pad_token_id is not None else self.llm.tokenizer.eos_token_id,
-                logits_processor=transformers.LogitsProcessorList(processors),
-                stopping_criteria=transformers.StoppingCriteriaList(stoppers),
-                # past_key_values=self._past_key_values,
-                output_scores=logprobs is not None and logprobs > 0,
-                return_dict_in_generate=True,
-                **generate_kwargs
             )
 
             # override the model config for do_sample when the temperature requires it
@@ -314,16 +338,15 @@ class ExLLaMASession(LLMSession):
 
             # if we are not streaming we still manually use the streamer for consistency
             else:
-                self.llm.model_obj.gen_begin(input_ids)
-                for _ in range(max_tokens):
-                    new_token = self.llm.model_obj.gen_single_token()
-                    # stop = stopping_criteria(self.llm.model_obj.sequence, self.llm.model_obj.sequence)
-                    # if stop or new_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
-                    if new_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
+                for token in self.llm.model_obj.generate_raw_stream_with_bias(**generate_args):
+                    print(self.llm.decode(self.llm.model_obj.sequence))
+                    scores = (self.llm.model_obj.logits[0],)
+                    stop = stopping_criteria(self.llm.model_obj.sequence, scores)
+                    if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
-
-                # generated_sequence = self.llm.model_obj.generate(**generate_args)
-                streamer.put(self.llm.model_obj.sequence)
+                scores = (self.llm.model_obj.logits[0],)
+                token_obj = GreedySearchDecoderOnlyOutput(sequences=self.llm.model_obj.sequence, scores=scores)
+                streamer.put(token_obj)
                 self.llm.cache[key] = streamer.__next__()
                 self._update_prefix_cache(streamer)
         return llm_cache[key]
