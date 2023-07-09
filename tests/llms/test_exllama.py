@@ -28,7 +28,7 @@ def test_basic():
 
     # just make sure it runs
     out = guidance("""The height of the Sears tower is {{#select 'answer'}}unknown{{or}}short{{or}}tall{{/select}}""")()
-    assert out['answer'] == 'large'
+    assert out['answer'] == 'tall'
     # assert int(out['answer']) > 1000
 
     out = guidance("""The Sun is very {{#select 'answer'}}hot{{or}}cold{{/select}}.""")()
