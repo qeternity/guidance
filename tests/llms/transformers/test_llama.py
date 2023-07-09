@@ -23,13 +23,12 @@ def test_basic():
     )
 
     # just make sure it runs
-    llm = guidance.llms.transformers.LLaMA(model, tokenizer, device='cuda', torch_dtype=torch.float16)
+    guidance.llm = guidance.llms.transformers.LLaMA(model, tokenizer, device='cuda', torch_dtype=torch.float16)
 
-    with llm.session() as s:
-        out = s("""The height of the Sears tower is {{gen 'answer' max_tokens=10}}""")
+    out = guidance("""The height of the Sears tower is {{gen 'answer' max_tokens=10}}""")()
 
-        out = s("""The Sun is very {{#select 'answer'}}hot{{or}}cold{{/select}}.""")
-        assert out["answer"] == 'hot'
+    out = guidance("""The Sun is very {{#select 'answer'}}hot{{or}}cold{{/select}}.""")()
+    assert out["answer"] == 'hot'
 
-        out = s("""The North Pole is {{#select 'answer'}}scorching{{or}}freezing{{/select}}.""")
-        assert out["answer"] == 'freezing'
+    out = guidance("""The North Pole is {{#select 'answer'}}scorching{{or}}freezing{{/select}}.""")()
+    assert out["answer"] == 'freezing'
