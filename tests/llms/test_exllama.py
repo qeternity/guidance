@@ -27,8 +27,8 @@ def test_basic():
     guidance.llm = guidance.llms.ExLLaMA(model=model, generator=generator, tokenizer=tokenizer, caching=False)
 
     # just make sure it runs
-    out = guidance("""The height of the Sears tower is {{#select 'answer'}}unknown{{or}}very tall{{or}}very short{{/select}}""")()
-    assert out['answer'] == 'tall'
+    out = guidance("""The height of the Sears tower is {{#select 'answer'}}unknown{{or}}small{{or}}large{{/select}}""")()
+    assert out['answer'] == 'large'
     # assert int(out['answer']) > 1000
 
     out = guidance("""The Sun is very {{#select 'answer'}}hot{{or}}cold{{/select}}.""")()
