@@ -23,7 +23,7 @@ def test_basic():
     )
 
     # just make sure it runs
-    guidance.llm = guidance.llms.transformers.LLaMA(model, tokenizer, device='cuda', torch_dtype=torch.float16)
+    guidance.llm = guidance.llms.transformers.LLaMA(model, tokenizer, device='cuda', torch_dtype=torch.float16, caching=False)
 
     out = guidance("""The height of the Sears tower is {{gen 'answer' max_tokens=10}}""")()
 
