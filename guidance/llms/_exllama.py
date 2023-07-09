@@ -59,10 +59,10 @@ class ExLLaMA(LLM):
         return self.tokenizer.decode(tokens, **kwargs)
     
     def id_to_token(self, id):
-        return self.tokenizer.convert_ids_to_tokens([id])[0]
+        return self.tokenizer_hf.convert_ids_to_tokens([id])[0]
     
     def token_to_id(self, token):
-        return self.tokenizer.convert_tokens_to_ids([token])[0]
+        return self.tokenizer_hf.convert_tokens_to_ids([token])[0]
     
     # def id_to_token(self, id):
     #     token = self.tokenizer.tokenizer.Decode(id)
