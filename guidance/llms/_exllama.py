@@ -106,6 +106,7 @@ class ExLLaMA(LLM):
 
 class ExLLaMASession(LLMSession):
     llm: ExLLaMA
+    device: str = 'cuda:0'
 
     def __init__(self, llm):
         super().__init__(llm)
