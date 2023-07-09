@@ -30,4 +30,5 @@ def test_basic():
     out = guidance(
         """The height of the Sears tower is {{gen 'answer' }}""", llm=llm
     )()
+    raise Exception(out)
     assert len(out["answer"]) > 0
