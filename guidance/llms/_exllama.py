@@ -280,21 +280,27 @@ class ExLLaMASession(LLMSession):
                 logprobs=logprobs
             )
 
-            # the args for the transformers generate call
+            # # the args for the transformers generate call
+            # generate_args = dict(
+            #     inputs=input_ids,
+            #     # attention_mask=attention_mask,
+            #     # position_ids=position_ids,
+            #     temperature=temperature,
+            #     max_new_tokens=max_tokens,
+            #     top_p=top_p,
+            #     pad_token_id=model_config.pad_token_id if model_config.pad_token_id is not None else self.llm.tokenizer.eos_token_id,
+            #     logits_processor=transformers.LogitsProcessorList(processors),
+            #     stopping_criteria=transformers.StoppingCriteriaList(stoppers),
+            #     # past_key_values=self._past_key_values,
+            #     output_scores=logprobs is not None and logprobs > 0,
+            #     return_dict_in_generate=True,
+            #     **generate_kwargs
+            # )
+
             generate_args = dict(
-                inputs=input_ids,
-                # attention_mask=attention_mask,
-                # position_ids=position_ids,
-                temperature=temperature,
+                prefix=input_ids,
+                logit_bias=logit_bias,
                 max_new_tokens=max_tokens,
-                top_p=top_p,
-                pad_token_id=model_config.pad_token_id if model_config.pad_token_id is not None else self.llm.tokenizer.eos_token_id,
-                logits_processor=transformers.LogitsProcessorList(processors),
-                stopping_criteria=transformers.StoppingCriteriaList(stoppers),
-                # past_key_values=self._past_key_values,
-                output_scores=logprobs is not None and logprobs > 0,
-                return_dict_in_generate=True,
-                **generate_kwargs
             )
 
             # override the model config for do_sample when the temperature requires it
@@ -315,14 +321,11 @@ class ExLLaMASession(LLMSession):
             # if we are not streaming we still manually use the streamer for consistency
             else:
                 self.llm.model_obj.gen_begin(input_ids)
-                for _ in range(max_tokens):
-                    new_token = self.llm.model_obj.gen_single_token()
-                    # stop = stopping_criteria(self.llm.model_obj.sequence, self.llm.model_obj.sequence)
-                    # if stop or new_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
-                    if new_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
+                for token in self.llm.model_obj.generate_raw_stream_with_bias(**generate_args):
+                    stop = stopping_criteria(self.llm.model_obj.sequence, self.llm.model_obj.sequence)
+                    if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
 
-                # generated_sequence = self.llm.model_obj.generate(**generate_args)
                 streamer.put(self.llm.model_obj.sequence)
                 self.llm.cache[key] = streamer.__next__()
                 self._update_prefix_cache(streamer)
