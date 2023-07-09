@@ -328,12 +328,12 @@ class TransformersSession(LLMSession):
                 generate_args["streamer"] = streamer
                 thread = threading.Thread(target=self.llm.model_obj.generate, kwargs=generate_args)
                 thread.start()
+                raise Exception(self._stream_then_save(streamer, key, thread))
                 return self._stream_then_save(streamer, key, thread)
 
             # if we are not streaming we still manually use the streamer for consistency
             else:
                 generated_sequence = self.llm.model_obj.generate(**generate_args)
-                raise Exception(generated_sequence)
                 streamer.put(generated_sequence)
                 self.llm.cache[key] = streamer.__next__()
                 self._update_prefix_cache(streamer)
