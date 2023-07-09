@@ -23,7 +23,7 @@ class ExLLaMA(LLM):
     llm_name: str = "transformers"
     device: str = None
 
-    def __init__(self, model: ExLlamaModel, generator: ExLlamaGenerator, tokenizer: ExLlamaTokenizer, caching=True, token_healing=False, acceleration=False, \
+    def __init__(self, model: ExLlamaModel, generator: ExLlamaGenerator, tokenizer: ExLlamaTokenizer, caching=True, token_healing=True, acceleration=False, \
                  temperature=0.0, device=None, **kwargs):
         super().__init__()
 
