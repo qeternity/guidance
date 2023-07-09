@@ -28,9 +28,12 @@ def test_basic():
 
     # just make sure it runs
     out = guidance("""The height of the Sears tower is {{gen 'answer' max_tokens=10}}""")()
+    print(out)
 
     out = guidance("""The Sun is very {{#select 'answer'}}hot{{or}}cold{{/select}}.""")()
+    print(out)
     assert out["answer"] == 'hot'
 
     out = guidance("""The North Pole is {{#select 'answer'}}scorching{{or}}freezing{{/select}}.""")()
+    print(out)
     assert out["answer"] == 'freezing'
