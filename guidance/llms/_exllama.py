@@ -54,16 +54,16 @@ class ExLLaMA(LLM):
         """
         return [v for arr in self._token_prefix_map.values(prefix=prefix) for v in arr]
 
-    # def encode(self, string, **kwargs):
-    #     return self.tokenizer_hf.encode(string, **kwargs)
-        
-    # def decode(self, tokens, **kwargs):
-    #     return self.tokenizer_hf.decode(tokens, **kwargs)
-    
     def encode(self, string, **kwargs):
-        return self.tokenizer.encode(string, **kwargs)
+        return self.tokenizer_hf.encode(string, **kwargs)
         
     def decode(self, tokens, **kwargs):
+        return self.tokenizer_hf.decode(tokens, **kwargs)
+    
+    def encode_ex(self, string, **kwargs):
+        return self.tokenizer.encode(string, **kwargs)
+        
+    def decode_ex(self, tokens, **kwargs):
         return self.tokenizer.decode(tokens, **kwargs)
     
     def id_to_token(self, id):
@@ -222,6 +222,10 @@ class ExLLaMASession(LLMSession):
             input_ids = encoded#["input_ids"]
             # attention_mask = encoded["attention_mask"]
             model_config = self.llm.model_obj.config
+
+            print(input_ids)
+            print(self.llm.encode_ex(prompt))
+            raise Exception('stop')
 
             # ensure that we are extending a common sequence batch (our token healing assumes this right now)
             assert (input_ids[0,-1] == input_ids[:,-1]).all(), "The current token healing implementation assumes that batches are reps of the same sequence!"
