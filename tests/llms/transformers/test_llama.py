@@ -28,4 +28,5 @@ def test_basic():
     out = guidance(
         """The Sun is very {{#select 'answer'}}hot{{or}}cold{{/select}}.""", llm=llm
     )()
+    print(out)
     assert len(out["answer"]) > 0
