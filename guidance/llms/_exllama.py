@@ -20,7 +20,7 @@ class ExLLaMA(LLM):
     """
 
     llm_name: str = "transformers"
-    device: str = 'cuda:0'
+    device: str = None
 
     def __init__(self, model: ExLlamaModel, generator: ExLlamaGenerator, tokenizer: ExLlamaTokenizer, caching=True, token_healing=False, acceleration=False, \
                  temperature=0.0, device=None, **kwargs):
@@ -337,8 +337,6 @@ class ExLLaMASession(LLMSession):
 
             # if we are not streaming we still manually use the streamer for consistency
             else:
-                print(input_ids)
-                raise Exception('stop')
                 for token in self.llm.model_obj.generate_raw_stream_with_bias(**generate_args):
                     # stop = stopping_criteria(self.llm.model_obj.sequence, self.llm.model_obj.sequence)
                     stop = False
