@@ -340,7 +340,7 @@ class ExLLaMASession(LLMSession):
             else:
                 for token in self.llm.model_obj.generate_raw_stream_with_bias(**generate_args):
                     scores = (self.llm.model_obj.logits[0],)
-                    stop = stopping_criteria(self.llm.model_obj.sequence, scores)
+                    stop = stopping_criteria(self.llm.model_obj.sequence, self.llm.model_obj.sequence)
                     if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
                 scores = (self.llm.model_obj.logits[0],)
