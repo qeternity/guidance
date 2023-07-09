@@ -58,18 +58,18 @@ class ExLLaMA(LLM):
     def decode(self, tokens, **kwargs):
         return self.tokenizer.decode(tokens, **kwargs)
     
-    def id_to_token(self, id):
-        return self.tokenizer_hf.convert_ids_to_tokens([id])[0]
-    
-    def token_to_id(self, token):
-        return self.tokenizer_hf.convert_tokens_to_ids([token])[0]
-    
     # def id_to_token(self, id):
-    #     token = self.tokenizer.tokenizer.Decode(id)
-    #     return token
+    #     return self.tokenizer_hf.convert_ids_to_tokens([id])[0]
     
     # def token_to_id(self, token):
-    #     return self.tokenizer.tokenizer.Encode(token)[-1]
+    #     return self.tokenizer_hf.convert_tokens_to_ids([token])[0]
+    
+    def id_to_token(self, id):
+        token = self.tokenizer.tokenizer.Decode(id)
+        return token
+    
+    def token_to_id(self, token):
+        return self.tokenizer.tokenizer.Encode(token)[-1]
 
     def end_of_text(self):
         return self.tokenizer.eos_token
