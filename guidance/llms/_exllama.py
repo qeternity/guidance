@@ -44,6 +44,7 @@ class ExLLaMA(LLM):
         self._token_prefix_map = self._build_token_prefix_map(model)
 
         self.tokenizer.eos_token = self.id_to_token(self.model.config.eos_token_id)
+        self.model_obj.config = self.model.config
 
     def new_string_builder(self, starting_ids=None):
         return ExLLaMAStringBuilder(self, starting_ids)
