@@ -213,7 +213,7 @@ class ExLLaMASession(LLMSession):
             assert prompt != "", "You must provide a non-zero length prompt to the Transformers language model!"
 
             print(self.llm.encode(prompt))
-            print(list(self.llm.encode_ex(prompt)[0]))
+            print(self.llm.encode_ex(prompt).squeeze().tolist())
             raise Exception('stop')
 
             # encode the prompt
