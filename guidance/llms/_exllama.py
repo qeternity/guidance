@@ -20,6 +20,7 @@ class ExLLaMA(LLM):
     """
 
     llm_name: str = "transformers"
+    device: str = 'cuda:0'
 
     def __init__(self, model: ExLlamaModel, generator: ExLlamaGenerator, tokenizer: ExLlamaTokenizer, caching=True, token_healing=False, acceleration=False, \
                  temperature=0.0, device=None, **kwargs):
@@ -106,7 +107,6 @@ class ExLLaMA(LLM):
 
 class ExLLaMASession(LLMSession):
     llm: ExLLaMA
-    device: str = 'cuda:0'
 
     def __init__(self, llm):
         super().__init__(llm)
