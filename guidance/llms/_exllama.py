@@ -563,6 +563,7 @@ class RegexLogitsProcessor():
         sort_inds = torch.argsort(scores, 1, True)
         to_bias = []
         for i in range(min(sort_inds.shape[1], self.max_consider)):
+            print(f'processor{i}')
             self.current_strings[0].extend([sort_inds[0,i]])
             proposed_string = str(self.current_strings[0])[self.prefix_length:]
             self.current_strings[0].pop()
