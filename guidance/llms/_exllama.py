@@ -351,7 +351,7 @@ class ExLLaMASession(LLMSession):
                     self.llm.model_obj.sequence = _seq
                     self.llm.model_obj.actual_sequence = _seq
                     stop = stopping_criteria(self.llm.model_obj.sequence, scores)
-                    if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
+                    if stop or next_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
                 scores = (self.llm.model_obj.logits[0],)
                 token_obj = GreedySearchDecoderOnlyOutput(sequences=self.llm.model_obj.sequence, scores=scores)
