@@ -347,7 +347,7 @@ class ExLLaMASession(LLMSession):
                     next_tokens = torch.argmax(next_tokens_scores, dim=-1)
                     print('#'*50)
                     print(token)
-                    print(next_tokens.unsqueeze())
+                    print(next_tokens.unsqueeze(dim=0))
                     print(self.llm.model_obj.sequence[:, :-1])
                     print('#'*50)
                     stop = stopping_criteria(self.llm.model_obj.sequence, scores)
