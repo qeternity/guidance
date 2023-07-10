@@ -333,7 +333,7 @@ class TransformersSession(LLMSession):
             # if we are not streaming we still manually use the streamer for consistency
             else:
                 generated_sequence = self.llm.model_obj.generate(**generate_args)
-                print(self.llm.decode(generated_sequence['sequences']))
+                print(self.llm.decode(generated_sequence['sequences'][0]))
                 streamer.put(generated_sequence)
                 self.llm.cache[key] = streamer.__next__()
                 self._update_prefix_cache(streamer)

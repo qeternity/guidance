@@ -176,7 +176,6 @@ class ExLLaMASession(LLMSession):
                        cache_seed=0, caching=None, **generate_kwargs):
         """ Generate a completion of the given prompt.
         """
-        print(f"{logit_bias}")
         # fill in defaults
         if temperature is None:
             temperature = self.llm.temperature
