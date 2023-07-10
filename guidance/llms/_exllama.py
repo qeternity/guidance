@@ -341,22 +341,17 @@ class ExLLaMASession(LLMSession):
             else:
                 self.llm.model_obj.gen_begin(input_ids)
                 for _ in range(max_tokens):
+                    token = self.llm.model_obj.gen_single_token()
                     scores = (self.llm.model_obj.logits[0],)
-                    next_tokens_scores = logits_processor(input_ids, scores[0])
-                    print(scores)
-                    print(next_tokens_scores)
-                    # token = self.llm.model_obj.gen_single_token()
-                    # scores = (self.llm.model_obj.logits[0],)
-                    # next_tokens_scores = logits_processor(input_ids, scores[0])
-                    # next_tokens = torch.argmax(next_tokens_scores, dim=-1)
-                    # next_token = next_tokens.unsqueeze(dim=0)
-                    # _seq = self.llm.model_obj.sequence[:, :-1]
-                    # _seq = torch.cat((_seq, next_token), dim = 1)
-                    # self.llm.model_obj.sequence = _seq
-                    # self.llm.model_obj.actual_sequence = _seq
+                    biased_scores = logits_processor(input_ids, scores[0])
+                    biased_token = torch.argmax(biased_scores, dim=-1).unsqueeze(dim=0)
+                    _seq = self.llm.model_obj.sequence[:, :-1]
+                    _seq = torch.cat((_seq, biased_token), dim = 1)
+                    self.llm.model_obj.sequence = _seq
+                    self.llm.model_obj.actual_sequence = _seq
                     stop = stopping_criteria(self.llm.model_obj.sequence, scores)
-                    # if stop or next_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
-                    #     break
+                    if stop or biased_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
+                        break
                 scores = (self.llm.model_obj.logits[0],)
                 token_obj = GreedySearchDecoderOnlyOutput(sequences=self.llm.model_obj.sequence, scores=scores)
                 streamer.put(token_obj)
