@@ -349,14 +349,13 @@ class ExLLaMASession(LLMSession):
                     _seq = torch.cat((_seq, biased_token), dim = 1)
                     self.llm.model_obj.sequence = _seq
                     self.llm.model_obj.actual_sequence = _seq
+                    token_obj = GreedySearchDecoderOnlyOutput(sequences=_seq, scores=biased_scores)
+                    streamer.put(token_obj)
+                    self.llm.cache[key] = streamer.__next__()
+                    self._update_prefix_cache(streamer)
                     stop = stopping_criteria(self.llm.model_obj.sequence, scores)
                     if stop or biased_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
-                scores = (self.llm.model_obj.logits[0],)
-                token_obj = GreedySearchDecoderOnlyOutput(sequences=self.llm.model_obj.sequence, scores=scores)
-                streamer.put(token_obj)
-                self.llm.cache[key] = streamer.__next__()
-                self._update_prefix_cache(streamer)
         return llm_cache[key]
     
     def _update_prefix_cache(self, streamer):
