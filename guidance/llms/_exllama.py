@@ -350,11 +350,6 @@ class ExLLaMASession(LLMSession):
                     _seq = torch.cat((_seq, next_token), dim = 1)
                     self.llm.model_obj.sequence = _seq
                     self.llm.model_obj.actual_sequence = _seq
-                    print('#'*50)
-                    print(token)
-                    print(next_tokens)
-                    print(self.llm.model_obj.sequence)
-                    print('#'*50)
                     stop = stopping_criteria(self.llm.model_obj.sequence, scores)
                     if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
