@@ -339,18 +339,16 @@ class ExLLaMASession(LLMSession):
 
             # if we are not streaming we still manually use the streamer for consistency
             else:
-                _input_ids = input_ids
-                for token in self.llm.model_obj.generate_raw_stream_with_bias(**generate_args):
+                self.llm.model_obj.gen_begin(input_ids)
+                for _ in range(max_tokens):
+                    token = self.llm.model_obj.gen_single_token()
                     scores = (self.llm.model_obj.logits[0],)
                     next_tokens_scores = logits_processor(input_ids, scores[0])
                     next_tokens = torch.argmax(next_tokens_scores, dim=-1)
-                    # print(input_ids)
-                    # print(token)
-                    # print(scores)
-                    # print(next_tokens_scores)
-                    # print(next_tokens)
-                    # print(self.llm.model_obj.sequence)
-                    # raise Exception('stop')
+                    print('#'*50)
+                    print(token)
+                    print(next_tokens)
+                    print('#'*50)
                     stop = stopping_criteria(self.llm.model_obj.sequence, scores)
                     if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
@@ -582,7 +580,6 @@ class RegexLogitsProcessor():
         for x in to_bias:
             self.bias_vector[x] = bias_value
         out = scores + self.bias_vector.to(scores.device)
-        print(out)
         if one_dim:
             return out[0]
         else:

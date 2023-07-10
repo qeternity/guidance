@@ -561,7 +561,6 @@ class RegexLogitsProcessor():
         for x in to_bias:
             self.bias_vector[x] = bias_value
         out = scores + self.bias_vector.to(scores.device)
-        print(out)
         if one_dim:
             return out[0]
         else:
