@@ -350,7 +350,7 @@ class ExLLaMASession(LLMSession):
                     # _seq = torch.cat((_seq, biased_token), dim = 1)
                     # self.llm.model_obj.sequence = _seq
                     # self.llm.model_obj.actual_sequence = _seq
-                    stop = stopping_criteria(self.llm.model_obj.sequence, scores)
+                    stop = stopping_criteria(self.llm.model_obj.sequence, biased_scores)
                     if stop or biased_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
                 token_obj = GreedySearchDecoderOnlyOutput(sequences=self.llm.model_obj.sequence)
