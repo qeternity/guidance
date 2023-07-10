@@ -72,8 +72,7 @@ a: on 30 days credit
     "terms": "{{gen 'terms'}}"
 }
 ```
-""".strip())
-    raise Exception(out)
+""".strip())()
     assert out['name'] == "Olympus"
     assert out['quantity'] == "1000mt"
 
