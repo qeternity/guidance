@@ -621,9 +621,9 @@ class RegexStoppingCriteria():
                 print(s.search(str(self.current_strings[i])[self.prefix_length:]))
                 if s.search(str(self.current_strings[i])[self.prefix_length:]):
                     found = True
+                    raise Exception('stop')
             if not found:
                 all_done = False
-                raise Exception('stop')
                 break
         
         return all_done
