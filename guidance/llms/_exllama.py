@@ -570,10 +570,6 @@ class RegexLogitsProcessor():
             if m:
                 to_bias.append(int(sort_inds[0, i]))
                 if self.is_greedy: # TODO: make this much faster for non-greedy sampling (by tracking how much prob mass we have looked through perhaps...)
-                    print(m)
-                    print(self.prefix_length)
-                    print(proposed_string)
-                    raise Exception('stop')
                     break # we are done if we are doing greedy sampling and we found the top valid hit
         
         # if we found no more valid tokens then we just end the sequence
@@ -586,6 +582,8 @@ class RegexLogitsProcessor():
         for x in to_bias:
             self.bias_vector[x] = bias_value
         out = scores + self.bias_vector.to(scores.device)
+        print(scores)
+        print(out)
         if one_dim:
             return out[0]
         else:
