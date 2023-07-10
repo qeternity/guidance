@@ -348,6 +348,7 @@ class ExLLaMASession(LLMSession):
                     print('#'*50)
                     print(token)
                     print(next_tokens)
+                    print(self.llm.model_obj.sequence)
                     print('#'*50)
                     stop = stopping_criteria(self.llm.model_obj.sequence, scores)
                     if stop or token[0, 0].item() == self.llm.tokenizer.eos_token_id:
