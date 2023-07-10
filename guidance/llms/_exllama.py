@@ -11,7 +11,8 @@ from exllama_lib.model import ExLlama as ExLlamaModel
 from exllama_lib.tokenizer import ExLlamaTokenizer
 from exllama_lib.generator import ExLlamaGenerator
 from transformers.models.llama.tokenization_llama_fast import LlamaTokenizer as LlamaTokenizerFast
-from transformers.generation.utils import GreedySearchDecoderOnlyOutput
+from transformers.generation.utils import GreedySearchDecoderOnlyOutput, GenerationMixin
+from transformers import AutoConfig, AutoTokenizer, AutoModelForCausalLM
 
 from ._llm import LLM, LLMSession, SyncSession
 
@@ -30,8 +31,9 @@ class ExLLaMA(LLM):
         # self.model_obj, self.tokenizer = self._model_and_tokenizer(model, tokenizer, **kwargs)
         self.model = model
         self.model_obj = generator
+        self.model_path = os.path.dirname(tokenizer.path)
         self.tokenizer = tokenizer
-        self.tokenizer_hf = LlamaTokenizerFast.from_pretrained(os.path.dirname(tokenizer.path))
+        self.tokenizer_hf = LlamaTokenizerFast.from_pretrained(self.model_path)
 
         # self.model_name = model if isinstance(model, str) else model.__class__.__name__
         self.caching = caching
@@ -328,6 +330,7 @@ class ExLLaMASession(LLMSession):
                 generate_args["do_sample"] = True
 
             # if we are streaming then we need to run the inference process in a separate thread
+            config_hf = AutoConfig.from_pretrained(self.llm.model_path)
             stopping_criteria = transformers.StoppingCriteriaList(stoppers)
             logits_processor = transformers.LogitsProcessorList(processors)
             if stream:
