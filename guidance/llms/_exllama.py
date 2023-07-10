@@ -55,17 +55,17 @@ class ExLLaMA(LLM):
         """
         return [v for arr in self._token_prefix_map.values(prefix=prefix) for v in arr]
 
-    # def encode(self, string, **kwargs):
-    #     return self.tokenizer_hf.encode(string, **kwargs)
-        
-    # def decode(self, tokens, **kwargs):
-    #     return self.tokenizer_hf.decode(tokens, **kwargs)
-    
     def encode(self, string, **kwargs):
-        return self.tokenizer.encode(string, **kwargs).squeeze().tolist()
+        return self.tokenizer_hf.encode(string, **kwargs)
         
     def decode(self, tokens, **kwargs):
-        return self.tokenizer.decode(tokens, **kwargs)
+        return self.tokenizer_hf.decode(tokens, **kwargs)
+    
+    # def encode(self, string, **kwargs):
+    #     return self.tokenizer.encode(string, **kwargs).squeeze().tolist()
+        
+    # def decode(self, tokens, **kwargs):
+    #     return self.tokenizer.decode(tokens, **kwargs)
     
     def id_to_token(self, id):
         return self.tokenizer_hf.convert_ids_to_tokens([id])[0]
