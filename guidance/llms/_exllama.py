@@ -339,19 +339,19 @@ class ExLLaMASession(LLMSession):
             # if we are not streaming we still manually use the streamer for consistency
             else:
                 self.llm.model_obj.gen_begin(input_ids)
-                for _ in range(10):
+                for _ in range(5):
                     token = self.llm.model_obj.gen_single_token()
                     scores = (self.llm.model_obj.logits[0],)
                     biased_scores = logits_processor(input_ids, scores[0])
                     biased_token = torch.argmax(biased_scores, dim=-1).unsqueeze(dim=0)
                     self.llm.model_obj.gen_feed_tokens(biased_token)
-                    if token != biased_token:
-                        print('#'*50)
-                        print(token)
-                        print(self.llm.tokenizer.decode(token))
-                        print(biased_token)
-                        print(self.llm.tokenizer_hf.decode(token[0]))
-                        print('#'*50)
+                    print('#'*50)
+                    print(token)
+                    print(self.llm.tokenizer.decode(token))
+                    print(biased_token)
+                    print(self.llm.tokenizer_hf.decode(token[0]))
+                    print(self.llm.tokenizer_hf.decode(self.llm.model_obj.sequence[0]))
+                    print('#'*50)
                     # _seq = self.llm.model_obj.sequence[:, :-1]
                     # _seq = torch.cat((_seq, biased_token), dim = 1)
                     # self.llm.model_obj.sequence = _seq
@@ -359,8 +359,6 @@ class ExLLaMASession(LLMSession):
                     stop = stopping_criteria(self.llm.model_obj.sequence, None)
                     if stop or biased_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
-                print(self.llm.tokenizer.eos_token_id)
-                print(self.llm.tokenizer_hf.decode(self.llm.model_obj.sequence[0]))
                 token_obj = GreedySearchDecoderOnlyOutput(sequences=self.llm.model_obj.sequence)
                 streamer.put(token_obj)
                 self.llm.cache[key] = streamer.__next__()
