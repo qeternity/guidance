@@ -25,7 +25,7 @@ def test_basic():
     # just make sure it runs
     guidance.llm = guidance.llms.transformers.LLaMA(model, tokenizer, device='cuda', torch_dtype=torch.float16, caching=False)
 
-    out = guidance("""The height of the Sears tower is {{gen 'answer' pattern='[0-9]{0,10}'}}""")()
+    out = guidance("""The height of the Sears tower is {{gen 'answer' pattern='[0-9]{0,10}'}} feet.""")()
     assert 1000 < int(out['answer']) < 10000
 
     # out = guidance("""The Sun is very {{#select 'answer'}}hot{{or}}cold{{/select}}.""")()
