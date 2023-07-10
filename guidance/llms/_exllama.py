@@ -582,8 +582,6 @@ class RegexLogitsProcessor():
         for x in to_bias:
             self.bias_vector[x] = bias_value
         out = scores + self.bias_vector.to(scores.device)
-        print(scores)
-        print(out)
         if one_dim:
             return out[0]
         else:
@@ -619,6 +617,7 @@ class RegexStoppingCriteria():
         for i in range(len(self.current_strings)):
             found = False
             for s in self.stop_patterns:
+                print(str(self.current_strings[i])[self.prefix_length:])
                 if s.search(str(self.current_strings[i])[self.prefix_length:]):
                     found = True
             if not found:
