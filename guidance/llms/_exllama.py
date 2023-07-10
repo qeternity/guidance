@@ -350,7 +350,7 @@ class ExLLaMASession(LLMSession):
                         print(token)
                         self.llm.tokenizer.decode(token)
                         print(biased_token)
-                        self.llm.tokenizer_hf.decode(token)
+                        self.llm.tokenizer_hf.decode(token[0])
                         print('#'*50)
                     # _seq = self.llm.model_obj.sequence[:, :-1]
                     # _seq = torch.cat((_seq, biased_token), dim = 1)
