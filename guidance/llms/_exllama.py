@@ -581,7 +581,6 @@ class RegexLogitsProcessor():
         bias_value = scores[0, sort_inds[0, 0]] - min_to_bias + 10 # make sure the tokens that fit the pattern have higher scores than the top value
         print(bias_value)
         print(to_bias)
-        raise Exception('stop')
         for x in to_bias:
             self.bias_vector[x] = bias_value
         out = scores + self.bias_vector.to(scores.device)
