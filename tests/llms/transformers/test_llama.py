@@ -73,6 +73,7 @@ a: on 30 days credit
 }
 ```
 """.strip())
+    raise Exception(out)
     assert out['name'] == "Olympus"
     assert out['quantity'] == "1000mt"
 
