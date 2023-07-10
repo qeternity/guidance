@@ -25,7 +25,54 @@ def test_basic():
     # just make sure it runs
     guidance.llm = guidance.llms.transformers.LLaMA(model, tokenizer, device='cuda', torch_dtype=torch.float16, caching=False)
 
-    out = guidance("The following are requests for fuel pricing for maritime vessels as conversations.\nFollowing the conversation is the parsed data from the conversation for the fuel request.\n\n### Start\na: Our good lady Lodesta Capella is completing discharging at Mersin and will go to dry dock at Tuzla.\nCould you check the indicative prices for two options:\n1) alongside at Mersin\n2) Barge supply Istanbul-Tuzla range\n\n50 mts MGO\nb: No problem\nb: CIA or need some credit terms?\na: COD or upto 7dd\nb: ok\na: thanks\nb: What at her dates in Mersin?\na: ETC 23-25 Apr\na: ETA Tuzla 29-30 Apr\nb: tks\n### End\n```json\n{\n    \"name\": \"Lady Lodesta Capella\",\n    \"destination\": \"Mersin\",\n    \"dates\": \"Apr 23-25\",\n    \"quantity\": \"1000mt\"\n    \"grade\": \"MGO\",\n    \"terms\": \"COD or up to 7dd\"\n}\n```\n\n### Start\na: looking to get a quote to refuel the olympus\na: needs 1000 tons vlsfo at ara in a weeks time\na: on 30 days credit\n### End\n```json\n{\n    \"name\": \"{{gen 'name'}}\",\n    \"destination\": \"{{gen 'destination'}}\",\n    \"dates\": \"{{gen 'eta'}}\",\n    \"quantity\": \"{{gen 'quantity'}}\"\n    \"grade\": \"{{#select 'grade'}}VLSFO{{or}}MGO{{or}}HFO{{/select}}\",\n    \"terms\": \"{{gen 'terms'}}\"\n}\n```")
+    out = guidance("""
+The following are requests for fuel pricing for maritime vessels as conversations.
+Following the conversation is the parsed data from the conversation for the fuel request.
+
+### Start
+a: Our good lady Lodesta Capella is completing discharging at Mersin and will go to dry dock at Tuzla.
+Could you check the indicative prices for two options:
+1) alongside at Mersin
+2) Barge supply Istanbul-Tuzla range
+
+50 mts MGO
+b: No problem
+b: CIA or need some credit terms?
+a: COD or upto 7dd
+b: ok
+a: thanks
+b: What at her dates in Mersin?
+a: ETC 23-25 Apr
+a: ETA Tuzla 29-30 Apr
+b: tks
+### End
+```json
+{
+    "name": "Lady Lodesta Capella",
+    "destination": "Mersin",
+    "dates": "Apr 23-25",
+    "quantity": "1000mt"
+    "grade": "MGO",
+    "terms": "COD or up to 7dd"
+}
+```
+
+### Start
+a: looking to get a quote to refuel the olympus
+a: needs 1000 tons vlsfo at ara in a weeks time
+a: on 30 days credit
+### End
+```json
+{
+    "name": "{{gen 'name'}}",
+    "destination": "{{gen 'destination'}}",
+    "dates": "{{gen 'eta'}}",
+    "quantity": "{{gen 'quantity'}}"
+    "grade": "{{#select 'grade'}}VLSFO{{or}}MGO{{or}}HFO{{/select}}",
+    "terms": "{{gen 'terms'}}"
+}
+```
+""".strip())
     assert out['name'] == "Olympus"
     assert out['quantity'] == "1000mt"
 
