@@ -59,6 +59,7 @@ class ExLLaMA(LLM):
         return self.tokenizer_hf.encode(string, **kwargs)
         
     def decode(self, tokens, **kwargs):
+        print(tokens)
         return self.tokenizer_hf.decode(tokens, **kwargs)
     
     # def encode(self, string, **kwargs):
