@@ -541,7 +541,6 @@ class RegexLogitsProcessor():
         self.bias_vector[:] = 0
         sort_inds = torch.argsort(scores, 1, True)
         to_bias = []
-        print(self.current_strings)
         for i in range(min(sort_inds.shape[1], self.max_consider)):
             self.current_strings[0].extend([sort_inds[0,i]])
             proposed_string = str(self.current_strings[0])[self.prefix_length:]
