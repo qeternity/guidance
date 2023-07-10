@@ -356,6 +356,7 @@ class ExLLaMASession(LLMSession):
                     stop = stopping_criteria(self.llm.model_obj.sequence, None)
                     if stop or biased_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
+                print(self.llm.tokenizer.eos_token_id)
                 print(self.llm.tokenizer_hf.decode(self.llm.model_obj.sequence[0]))
                 token_obj = GreedySearchDecoderOnlyOutput(sequences=self.llm.model_obj.sequence)
                 streamer.put(token_obj)
