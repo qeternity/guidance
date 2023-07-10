@@ -345,6 +345,10 @@ class ExLLaMASession(LLMSession):
                     biased_scores = logits_processor(input_ids, scores[0])
                     biased_token = torch.argmax(biased_scores, dim=-1).unsqueeze(dim=0)
                     self.llm.model_obj.gen_feed_tokens(biased_token)
+                    print('#'*50)
+                    print(token)
+                    print(biased_token)
+                    print('#'*50)
                     # _seq = self.llm.model_obj.sequence[:, :-1]
                     # _seq = torch.cat((_seq, biased_token), dim = 1)
                     # self.llm.model_obj.sequence = _seq
