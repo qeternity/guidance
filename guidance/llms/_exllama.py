@@ -339,7 +339,7 @@ class ExLLaMASession(LLMSession):
             # if we are not streaming we still manually use the streamer for consistency
             else:
                 self.llm.model_obj.gen_begin(input_ids)
-                for _ in range(max_tokens):
+                for _ in range(10):
                     token = self.llm.model_obj.gen_single_token()
                     scores = (self.llm.model_obj.logits[0],)
                     biased_scores = logits_processor(input_ids, scores[0])
@@ -352,7 +352,7 @@ class ExLLaMASession(LLMSession):
                     stop = stopping_criteria(self.llm.model_obj.sequence, None)
                     if stop or biased_token[0, 0].item() == self.llm.tokenizer.eos_token_id:
                         break
-                print(self.llm.tokenizer_hf.decode(self.llm.model_obj.sequence))
+                print(self.llm.tokenizer_hf.decode(self.llm.model_obj.sequence[0]))
                 token_obj = GreedySearchDecoderOnlyOutput(sequences=self.llm.model_obj.sequence)
                 streamer.put(token_obj)
                 self.llm.cache[key] = streamer.__next__()
