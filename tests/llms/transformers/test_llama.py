@@ -23,7 +23,7 @@ def test_basic():
     )
 
     # just make sure it runs
-    guidance.llm = guidance.llms.transformers.LLaMA(model, tokenizer, device='cuda', torch_dtype=torch.float16, caching=False)
+    guidance.llm = guidance.llms.transformers.LLaMA(model, tokenizer, torch_dtype=torch.float16, caching=False)
 
     out = guidance("""
 The following are requests for fuel pricing for maritime vessels as conversations.
